@@ -20,7 +20,7 @@ void UMover::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ... testing xzfsdsad  s 
+	OriginalLocation = GetOwner()->GetActorLocation();
 	
 }
 
@@ -30,15 +30,17 @@ void UMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	AActor * Owner = GetOwner();
-	FString name = (*Owner).GetActorNameOrLabel();
-	FVector Location = Owner->GetActorLocation();
-	FString LocationString = Location.ToCompactString();	
+	if (ShouldMove)
+	{
+		FVector CurrentLocation = GetOwner()->GetActorLocation();
+		FVector TargetLocation = OriginalLocation + MoveOffset;
+		// distance we need to move divided by the time which we need ot move over
+		// distance between the Original & Target
+		float Speed = FVector::Distance(OriginalLocation, TargetLocation) / MoveTime;
+		
+		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
 
-	UE_LOG(LogTemp, Display, TEXT("Mover Owner Address: %s"), *name);
-	UE_LOG(LogTemp, Display, TEXT("The Location is %s"), *LocationString);
-
-	// ...
-	
+		(*GetOwner()).SetActorLocation(NewLocation);
+	}
 }
 
