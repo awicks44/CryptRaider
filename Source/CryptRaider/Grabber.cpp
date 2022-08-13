@@ -37,9 +37,25 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	FVector End = Start + GetForwardVector() * MaxGrabDistance;
 	
 	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false);
-	
 
+	float Damage = 0;
+	float & DamageRef = Damage;	
+	DamageRef = 5;
 
+	// to variables that point to the same pice of memory
+	UE_LOG(LogTemp, Display, TEXT("DamageRef: %f, Damage: %f"), DamageRef, Damage);	
+	PrintDamage(Damage);
+	UE_LOG(LogTemp, Display, TEXT("DamageRef: %f, Damage: %f"), DamageRef, Damage);
 	
 }
+
+// with this call, we aren't actually making a copy of damage inside the method
+// we are getting a reference of the damage var calling this function. We are accessing
+// the original piece of memory
+void UGrabber::PrintDamage(float& Damage)
+{
+	Damage = 2;
+	UE_LOG(LogTemp, Display, TEXT("The Damage: %f"), Damage);
+}
+
 
