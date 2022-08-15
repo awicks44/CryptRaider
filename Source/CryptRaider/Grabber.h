@@ -28,9 +28,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	float MaxGrabDistance = 400;
 
-	void PrintDamage(const float& Damage);
-	// 
-	bool HasDamage(float& OutDamage);
+	UPROPERTY(EditAnywhere)
+	float GrabRadius = 100;
 
 		
 };

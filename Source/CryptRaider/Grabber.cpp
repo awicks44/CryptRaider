@@ -38,31 +38,26 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	
 	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false);
 
-	float Damage;
-	if (HasDamage(Damage))
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(GrabRadius);
+	FHitResult HitResult;
+
+	bool HasHit = GetWorld()->SweepSingleByChannel(
+		HitResult, 
+		Start, End, 
+		FQuat::Identity, 
+		ECC_GameTraceChannel2,
+		Sphere
+	);
+
+	if (HasHit)
 	{
-		PrintDamage(Damage);
+		AActor * HitActor = HitResult.GetActor();
+		FString HitActorName = (*HitActor).GetActorNameOrLabel();
+		UE_LOG(LogTemp, Display, TEXT("We hit the actor %s"), *HitActorName);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Display, TEXT("No actor hit"));
 	}
 
 }
-
-// with this call, we aren't actually making a copy of damage inside the method
-// we are getting a reference of the damage var calling this function. We are accessing
-// the original piece of memory. We can accidentally modify variables unexpected. To fix that
-// we can put const in front of the data type reference declaration. It tells C++ that we can only
-// utilize the variable and not modify. 
-void UGrabber::PrintDamage(const float& Damage)
-{
-	//Damage = 2;
-	UE_LOG(LogTemp, Display, TEXT("The Damage: %f"), Damage);
-}
-
-// this is how we use non-const rewferences as out parameters. A way of getting multiple 
-// rewturn values out of a function
-bool UGrabber::HasDamage(float& OutDamage)
-{
-	OutDamage = 5;
-	return true;
-}
-
-
