@@ -36,15 +36,28 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		UE_LOG(LogTemp, Display, TEXT("No Physics Handle pointer"));
 		return;
 	}
-		
 
-	FVector TargetLocation = GetComponentLocation() + GetForwardVector() * HoldDistance;
-	PhysicsHandle->SetTargetLocationAndRotation(TargetLocation, GetComponentRotation());
+	if (PhysicsHandle->GetGrabbedComponent() != nullptr)
+	{
+		FVector TargetLocation = GetComponentLocation() + GetForwardVector() * HoldDistance;
+		PhysicsHandle->SetTargetLocationAndRotation(TargetLocation, GetComponentRotation());
+	}
 }
 
 void UGrabber::Release()
 {
-	UE_LOG(LogTemp, Display, TEXT("Released Grabber"));
+	UPhysicsHandleComponent * PhysicsHandle = GetPhysicsHandle();
+	if (PhysicsHandle == nullptr)
+	{	
+		return;
+	}
+	
+	if (PhysicsHandle->GetGrabbedComponent() != nullptr)
+	{
+		PhysicsHandle->GetGrabbedComponent()->WakeAllRigidBodies();
+		PhysicsHandle->ReleaseComponent();
+	}
+	
 }
 
 void UGrabber::Grab()
@@ -74,8 +87,11 @@ void UGrabber::Grab()
 
 	if (HasHit)
 	{
+		UPrimitiveComponent * HitComponent = HitResult.GetComponent();
+		HitComponent->WakeAllRigidBodies();
 		//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10, 10, FColor::Red, false, 5);
-		PhysicsHandle->GrabComponentAtLocationWithRotation(HitResult.GetComponent(),
+		PhysicsHandle->GrabComponentAtLocationWithRotation(
+		HitComponent,
 		NAME_None,
 		HitResult.ImpactPoint,
 		GetComponentRotation()
