@@ -17,5 +17,23 @@ class CRYPTRAIDER_API UTriggerComponent : public UBoxComponent
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+public:	
+	UTriggerComponent();
+	
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	// dependency injection
+	UFUNCTION(BlueprintCallable)
+	void SetMover(class UMover* InjectedMover);
+
+private: 
+	UPROPERTY(EditAnywhere, Category = "Crypt Component")
+	FName AcceptableActorTag;
+
+	AActor * GetAcceptableActor() const;
+
+	class UMover * Mover;
 	
 };
